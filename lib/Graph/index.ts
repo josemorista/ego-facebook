@@ -64,9 +64,9 @@ export class Graph<V> {
   }
 
   print () {
-    console.log(this.vertices.map(vertex => {
+    return this.vertices.map(vertex => {
       return `${JSON.stringify(vertex)} => ${this.edges.get(vertex)?.join(', ')}`;
-    }).join('\n'));
+    }).join('\n');
   }
 
 }
