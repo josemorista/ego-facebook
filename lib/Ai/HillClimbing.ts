@@ -24,27 +24,27 @@ export const hillClimbing = <S>({ evalFunction, initialState: { solution, explor
 		if (acceptableSolution && acceptableSolution(evalValue)) return { solution: actualSolution, eval: evalValue };
 		if (maxIterations && iterationsCount >= maxIterations) return { solution: actualSolution, eval: evalValue };
 
-		let bestNeighbor = -1;
+		let bestNeighbor = -1, bestNeighborEval = Number.MIN_SAFE_INTEGER;
 		const neighbors = expandFunction(actualSolution).filter(el => !exploredStates.includes(el));
 		const neighborsLength = neighbors.length;
 		for (let i = 0; i < neighborsLength; i++) {
 			exploredStates.push(neighbors[i]);
 			const localEval = evalFunction(neighbors[i]);
-			if (localEval > evalValue) {
-				evalValue = localEval;
-				bestNeighbor = i;
-			} else if (localEval === evalValue && performSideways && sidewaysCount < performSideways) { // Optional sideway count
-				sidewaysCount += 1;
-				evalValue = localEval;
+			if (localEval >= bestNeighborEval) {
+				bestNeighborEval = localEval;
 				bestNeighbor = i;
 			}
 		}
-		if (bestNeighbor === -1) {
+		if (bestNeighborEval < evalValue) {
 			return { solution: actualSolution, eval: evalValue };
-		} else {
+		} else if (evalValue === bestNeighborEval && performSideways && sidewaysCount < performSideways) {
+			sidewaysCount += 1;
 			actualSolution = neighbors[bestNeighbor];
-			iterationsCount += 1;
+		} else {
+			evalValue = bestNeighborEval;
+			actualSolution = neighbors[bestNeighbor];
 		}
+		iterationsCount += 1;
 	}
 
 };
