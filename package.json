@@ -4,8 +4,10 @@
 	"main": "index.js",
 	"license": "MIT",
 	"scripts": {
-		"dev:hill": "ts-node-dev --ignore-watch node_modules index.ts",
-		"dev:greedy": "ts-node-dev --ignore-watch node_modules greedy.ts"
+		"dev:hill": "ts-node-dev --ignore-watch node_modules src/hill.ts",
+		"dev:greedy": "ts-node-dev --ignore-watch node_modules src/greedy.ts",
+		"dev:brute": "ts-node-dev --ignore-watch node_modules src/bruteForceDegrees.ts",
+		"build": "yarn tsc"
 	},
 	"devDependencies": {
 		"@types/node": "^14.11.2",
