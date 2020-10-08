@@ -1,9 +1,6 @@
 interface Problem<S> {
 	evalFunction: (solution: S) => number;
-	initialState: {
-		solution: S;
-		explored: Array<S>;
-	};
+	seed: S;
 	acceptableSolution?: (evalValue: number) => boolean;
 	expandFunction: (solution: S) => Array<S>;
 }
@@ -11,11 +8,11 @@ interface Problem<S> {
 interface HillClimbingOptions {
 	performSideways?: number;
 	maxIterations?: number;
+	firstBestCandidate?: boolean;
 }
 
-export const hillClimbing = <S>({ evalFunction, initialState: { solution, explored }, expandFunction, acceptableSolution }: Problem<S>, { performSideways, maxIterations }: HillClimbingOptions = {}): { solution: S, eval: number } => {
-	const exploredStates: Array<S> = explored;
-	let actualSolution = solution, iterationsCount = 0, sidewaysCount = 0;
+export const hillClimbing = <S>({ evalFunction, seed, expandFunction, acceptableSolution }: Problem<S>, { performSideways, maxIterations }: HillClimbingOptions = {}): { solution: S, eval: number } => {
+	let actualSolution = seed, iterationsCount = 0, sidewaysCount = 0;
 	let evalValue = evalFunction(actualSolution);
 
 	while (true) {
@@ -25,16 +22,17 @@ export const hillClimbing = <S>({ evalFunction, initialState: { solution, explor
 		if (maxIterations && iterationsCount >= maxIterations) return { solution: actualSolution, eval: evalValue };
 
 		let bestNeighbor = -1, bestNeighborEval = Number.MIN_SAFE_INTEGER;
-		const neighbors = expandFunction(actualSolution).filter(el => !exploredStates.includes(el));
+		const neighbors = expandFunction(actualSolution);
 		const neighborsLength = neighbors.length;
+
 		for (let i = 0; i < neighborsLength; i++) {
-			exploredStates.push(neighbors[i]);
 			const localEval = evalFunction(neighbors[i]);
 			if (localEval >= bestNeighborEval) {
 				bestNeighborEval = localEval;
 				bestNeighbor = i;
 			}
 		}
+
 		if (bestNeighborEval < evalValue) {
 			return { solution: actualSolution, eval: evalValue };
 		} else if (evalValue === bestNeighborEval && performSideways && sidewaysCount < performSideways) {
