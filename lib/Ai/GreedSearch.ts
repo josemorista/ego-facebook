@@ -19,10 +19,9 @@ export const greedSearch = <S>({ heuristic, initialState: initialState, expandFu
 		const current = frontier.shift() || {} as S;
 		// Optional premature end conditions
 		if ((isSolution && isSolution(current)) || (maxIterations && iterationsCount >= maxIterations)) return { solution: current, iterations: iterationsCount };
-
 		explored.push(current);
-
-		frontier = [...frontier, ...expandFunction(current).filter(el => !explored.includes(el))].sort((a, b) => heuristic(b) - heuristic(a));
+		console.log(frontier.length);
+		frontier = [...frontier, ...expandFunction(current).filter(el => !explored.includes(el) && !frontier.includes(el))].sort((a, b) => heuristic(b) - heuristic(a));
 
 		if (frontier.length === 0) {
 			return { solution: current, iterations: iterationsCount };
