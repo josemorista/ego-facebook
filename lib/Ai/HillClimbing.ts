@@ -18,8 +18,7 @@ export const hillClimbing = <S>({ evalFunction, seed, expandFunction, acceptable
 	while (true) {
 
 		// Optional premature end conditions
-		if (acceptableSolution && acceptableSolution(evalValue)) return { solution: actualSolution, eval: evalValue, iterations: iterationsCount };
-		if (maxIterations && iterationsCount >= maxIterations) return { solution: actualSolution, eval: evalValue, iterations: iterationsCount };
+		if ((acceptableSolution && acceptableSolution(evalValue)) || (maxIterations && iterationsCount >= maxIterations)) return { solution: actualSolution, eval: evalValue, iterations: iterationsCount };
 
 		let bestNeighbor = -1, bestNeighborEval = Number.MIN_SAFE_INTEGER;
 		const neighbors = expandFunction(actualSolution);
