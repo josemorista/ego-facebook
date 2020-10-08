@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { hillClimbing } from './lib/Ai/HillClimbing';
 
+const usersToSearch = 10;
+
 const loadEgoData = (filename: string) => {
 	const g = new Graph<string>({
 		bilateral: true
@@ -33,33 +35,33 @@ fs.writeFileSync('egoGraph.txt', g.print());
 
 
 // First, let's get the elements with the biggest degree
-let seed: Array<{ solution: string, eval: number }> = [];
+let bestSeed: Array<{ solution: string, eval: number }> = [];
 const vertexCount = g.getVertexCount();
 for (let i = 0; i < vertexCount; i++) {
 	const vertex = String(i);
 	const localEval = g.getVertexRelations(vertex).length;
-	if (seed.length < 5) {
-		seed.push({
+	if (bestSeed.length < usersToSearch) {
+		bestSeed.push({
 			solution: vertex,
 			eval: localEval
 		});
 	} else {
-		let minIndex = 0, minValue = seed[0].eval;
-		seed.forEach((el, index) => {
+		let minIndex = 0, minValue = bestSeed[0].eval;
+		bestSeed.forEach((el, index) => {
 			if (el.eval < minValue) {
 				minValue = el.eval;
 				minIndex = index;
 			}
 		});
-		if (seed[minIndex].eval < localEval) {
-			seed[minIndex] = {
+		if (bestSeed[minIndex].eval < localEval) {
+			bestSeed[minIndex] = {
 				solution: vertex,
 				eval: localEval
 			};
 		}
 	}
 }
-seed = seed.sort((a, b) => b.eval - a.eval);
+bestSeed = bestSeed.sort((a, b) => b.eval - a.eval);
 
 // Here is our evaluation function
 const evalFunction = (solution: Array<string>) => {
@@ -74,24 +76,28 @@ const evalFunction = (solution: Array<string>) => {
 const solution = hillClimbing<Array<string>>({
 	evalFunction,
 	expandFunction: (candidateSolution) => {
-		const neighbors: Array<Array<string>> = [];
-		candidateSolution.forEach(el => {
-			const edges = g.getVertexRelations(el).filter(el => !candidateSolution.includes(el));
-			edges.forEach(edge => {
-				for (let i = 0; i < candidateSolution.length; i++) {
-					const tmp = [...candidateSolution[i]];
-					tmp[i] = edge;
-					neighbors.push(tmp);
-				}
-			});
+		let neighbors: Array<string> = [], worstCandidateValue = Number.MAX_SAFE_INTEGER, worstCandidateIndex = -1;
+		candidateSolution.forEach((el, index) => {
+			const relations = g.getVertexRelations(el);
+			if (relations.length < worstCandidateValue) {
+				worstCandidateValue = relations.length;
+				worstCandidateIndex = index;
+			}
+			neighbors = [...neighbors, ...relations.filter(el => !candidateSolution.includes(el))];
 		});
-		return neighbors;
+
+		return neighbors.map(el => {
+			const tmp = [...candidateSolution];
+			tmp[worstCandidateIndex] = el;
+			return tmp;
+		});
 	},
-	seed: seed.map(el => el.solution),
+	seed: [...new Array(usersToSearch)].map(() => String(Math.round(Math.random() * g.getVertexCount())))
+	//seed: bestSeed.map(el => el.solution),
 }, {
-	performSideways: 5
+	performSideways: 10
 });
 
 // Logging our solutions and groundTruth
-console.log('biggest degree:', seed);
+console.log('biggest degree:', bestSeed);
 console.log(solution);

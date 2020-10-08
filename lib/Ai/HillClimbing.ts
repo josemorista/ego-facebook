@@ -11,15 +11,15 @@ interface HillClimbingOptions {
 	firstBestCandidate?: boolean;
 }
 
-export const hillClimbing = <S>({ evalFunction, seed, expandFunction, acceptableSolution }: Problem<S>, { performSideways, maxIterations }: HillClimbingOptions = {}): { solution: S, eval: number } => {
+export const hillClimbing = <S>({ evalFunction, seed, expandFunction, acceptableSolution }: Problem<S>, { performSideways, maxIterations, firstBestCandidate }: HillClimbingOptions = {}): { solution: S, eval: number, iterations: number } => {
 	let actualSolution = seed, iterationsCount = 0, sidewaysCount = 0;
 	let evalValue = evalFunction(actualSolution);
 
 	while (true) {
 
 		// Optional premature end conditions
-		if (acceptableSolution && acceptableSolution(evalValue)) return { solution: actualSolution, eval: evalValue };
-		if (maxIterations && iterationsCount >= maxIterations) return { solution: actualSolution, eval: evalValue };
+		if (acceptableSolution && acceptableSolution(evalValue)) return { solution: actualSolution, eval: evalValue, iterations: iterationsCount };
+		if (maxIterations && iterationsCount >= maxIterations) return { solution: actualSolution, eval: evalValue, iterations: iterationsCount };
 
 		let bestNeighbor = -1, bestNeighborEval = Number.MIN_SAFE_INTEGER;
 		const neighbors = expandFunction(actualSolution);
@@ -30,11 +30,14 @@ export const hillClimbing = <S>({ evalFunction, seed, expandFunction, acceptable
 			if (localEval >= bestNeighborEval) {
 				bestNeighborEval = localEval;
 				bestNeighbor = i;
+				if (firstBestCandidate) {
+					break;
+				}
 			}
 		}
 
 		if (bestNeighborEval < evalValue) {
-			return { solution: actualSolution, eval: evalValue };
+			return { solution: actualSolution, eval: evalValue, iterations: iterationsCount };
 		} else if (evalValue === bestNeighborEval && performSideways && sidewaysCount < performSideways) {
 			sidewaysCount += 1;
 			actualSolution = neighbors[bestNeighbor];
