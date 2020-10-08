@@ -7,6 +7,9 @@
 		"dev:hill": "ts-node-dev --ignore-watch node_modules src/hill.ts",
 		"dev:greedy": "ts-node-dev --ignore-watch node_modules src/greedy.ts",
 		"dev:brute": "ts-node-dev --ignore-watch node_modules src/bruteForceDegrees.ts",
+		"hill": "node dist/hill.js",
+		"greedy": "node dist/greedy.js",
+		"brute": "node dist/bruteForceDegrees.js",
 		"build": "yarn tsc"
 	},
 	"devDependencies": {
