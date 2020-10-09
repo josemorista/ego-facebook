@@ -34,7 +34,7 @@ function addList(l: List, state: any, value: number): List {
 	return l;
 }
 
-export const greedSearch = <S>({ heuristic, initialState: initialState, expandFunction, isSolution }: Problem<S>, { maxIterations }: GreedSearchOptions = {}): { solution: S, iterations: number } => {
+export const greedSearch = <S>({ heuristic, initialState: initialState, expandFunction, isSolution }: Problem<S>, { maxIterations }: GreedSearchOptions = {}): { solution: S, iterations: number } | null => {
 	const explored: Array<S> = [];
 	let frontier: List | null = addList(null, initialState, heuristic(initialState));
 	let iterationsCount = 0;
@@ -42,11 +42,12 @@ export const greedSearch = <S>({ heuristic, initialState: initialState, expandFu
 	while (true) {
 
 		const current = frontier?.state;
-		console.log(frontier?.value);
 		frontier = frontier?.next || null;
 
 		// Optional premature end conditions
-		if ((isSolution && isSolution(current)) || (maxIterations && iterationsCount >= maxIterations)) return { solution: current, iterations: iterationsCount };
+		if ((isSolution(current)) || (maxIterations && iterationsCount >= maxIterations)) {
+			return { solution: current, iterations: iterationsCount };
+		}
 
 		explored.push(current);
 
@@ -55,7 +56,7 @@ export const greedSearch = <S>({ heuristic, initialState: initialState, expandFu
 		});
 
 		if (!frontier) {
-			return { solution: current, iterations: iterationsCount };
+			return null;
 		}
 
 		iterationsCount += 1;

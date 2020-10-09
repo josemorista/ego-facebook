@@ -16,6 +16,8 @@ const heuristic = (solution: Array<string>) => {
 	return sum;
 };
 
+
+
 let lastSolution = -1;
 
 const greedySolution = greedSearch<Array<string>>({
@@ -46,4 +48,8 @@ const greedySolution = greedSearch<Array<string>>({
 	initialState: [...new Array(usersToSearch)].map(() => String(Math.round(Math.random() * g.getVertexCount())))
 });
 
-console.log('Greedy search solution:', greedySolution);
+console.table({
+	solution: greedySolution?.solution.join(','),
+	iterations: greedySolution?.iterations,
+	evaluation: heuristic(greedySolution?.solution || [])
+});

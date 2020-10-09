@@ -46,5 +46,4 @@ export const hillClimbing = <S>({ evalFunction, seed, expandFunction, acceptable
 		}
 		iterationsCount += 1;
 	}
-
 };
