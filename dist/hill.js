@@ -17,27 +17,32 @@ const evalFunction = (solution) => {
     });
     return sum;
 };
+const expandFunction = (candidateSolution) => {
+    let neighbors = [], worstCandidateValue = Number.MAX_SAFE_INTEGER, worstCandidateIndex = -1;
+    candidateSolution.forEach((el, index) => {
+        const relations = g.getVertexRelations(el);
+        if (relations.length < worstCandidateValue) {
+            worstCandidateValue = relations.length;
+            worstCandidateIndex = index;
+        }
+        neighbors = [...neighbors, ...relations.filter(el => !candidateSolution.includes(el))];
+    });
+    return neighbors.map(el => {
+        const tmp = [...candidateSolution];
+        tmp[worstCandidateIndex] = el;
+        return tmp;
+    });
+};
 // Hill Climbing sideways and with random restarts to find our solutions
-const solution = HillClimbing_1.hillClimbing({
+const hillSolution = HillClimbing_1.hillClimbing({
     evalFunction,
-    expandFunction: (candidateSolution) => {
-        let neighbors = [], worstCandidateValue = Number.MAX_SAFE_INTEGER, worstCandidateIndex = -1;
-        candidateSolution.forEach((el, index) => {
-            const relations = g.getVertexRelations(el);
-            if (relations.length < worstCandidateValue) {
-                worstCandidateValue = relations.length;
-                worstCandidateIndex = index;
-            }
-            neighbors = [...neighbors, ...relations.filter(el => !candidateSolution.includes(el))];
-        });
-        return neighbors.map(el => {
-            const tmp = [...candidateSolution];
-            tmp[worstCandidateIndex] = el;
-            return tmp;
-        });
-    },
+    expandFunction,
     seed: [...new Array(usersToSearch)].map(() => String(Math.round(Math.random() * g.getVertexCount())))
 }, {
-    performSideways: 10
+    firstBestCandidate: false
 });
-console.log('Hill climbing solution:', solution);
+console.table({
+    solution: hillSolution.solution.join(','),
+    iterations: hillSolution.iterations,
+    evaluation: hillSolution.eval
+});

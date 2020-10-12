@@ -25,17 +25,17 @@ exports.greedSearch = ({ heuristic, initialState: initialState, expandFunction, 
     let iterationsCount = 0;
     while (true) {
         const current = frontier === null || frontier === void 0 ? void 0 : frontier.state;
-        console.log(frontier === null || frontier === void 0 ? void 0 : frontier.value);
         frontier = (frontier === null || frontier === void 0 ? void 0 : frontier.next) || null;
         // Optional premature end conditions
-        if ((isSolution && isSolution(current)) || (maxIterations && iterationsCount >= maxIterations))
+        if ((isSolution(current)) || (maxIterations && iterationsCount >= maxIterations)) {
             return { solution: current, iterations: iterationsCount };
+        }
         explored.push(current);
         expandFunction(current).filter(el => !explored.includes(el)).forEach(candidate => {
             frontier = addList(frontier, candidate, heuristic(candidate));
         });
         if (!frontier) {
-            return { solution: current, iterations: iterationsCount };
+            return null;
         }
         iterationsCount += 1;
     }

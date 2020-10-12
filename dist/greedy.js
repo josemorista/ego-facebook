@@ -45,4 +45,8 @@ const greedySolution = GreedSearch_1.greedSearch({
     },
     initialState: [...new Array(usersToSearch)].map(() => String(Math.round(Math.random() * g.getVertexCount())))
 });
-console.log('Greedy search solution:', greedySolution);
+console.table({
+    solution: greedySolution === null || greedySolution === void 0 ? void 0 : greedySolution.solution.join(','),
+    iterations: greedySolution === null || greedySolution === void 0 ? void 0 : greedySolution.iterations,
+    evaluation: heuristic((greedySolution === null || greedySolution === void 0 ? void 0 : greedySolution.solution) || [])
+});
